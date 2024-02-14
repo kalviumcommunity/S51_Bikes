@@ -13,7 +13,7 @@ This web application facilitates the buying and selling of second-hand bikes. Us
 
 ## Technologies Used
 - Frontend: HTML, CSS, JavaScript, React.js
-- Backend: Node.js, Express.js, MongoDB
+- Backend: Node.js, Express.js, MongoDB 
 - Authentication: JSON Web Tokens (JWT)
 - Image Upload: Cloudinary
 - Deployment: Heroku
