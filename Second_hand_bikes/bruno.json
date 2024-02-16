@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Second_hand_bikes",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
