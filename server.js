@@ -1,27 +1,34 @@
-require("dotenv").config()
-const mongoose = require("mongoose")
-const {connect,isconnected}=require("./database")
+const { startDatabase, stopDatabase, isConnected } = require('./database');
+const {getRouter,postRouter,patchRouter,deleteRouter} = require(`./Routes/routes`);
+const bodyparser = require('body-parser')
+
+require('dotenv').config()
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.use(bodyparser.json())
+app.use("/",getRouter)
+app.use("/",postRouter)
+app.use("/",patchRouter)
+app.use("/",deleteRouter)
 
 
-const express = require('express')
-const app = express()
-connect()
-
-app.get('/',(req, res)=>{
-    res.send(`${isconnected?"connected":"disconnected"}`)
-})
-
-app.get('/ping',(req,res)=>{
-    res.send("pong")
-})
-
-mongoose.connection.once('open', () => {
-    console.log('MongoDB connection successful');
-    if (require.main === module) {
-        app.listen(3000, () => {
-            console.log('Starting server ...');
-        });
-    }
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Status',
+    database: isConnected() ? 'connected' : 'disconnected'
+  })
 });
 
+  
+  app.get('/ping', (req, res) => {
+    res.send('pong');
+  });
+  
+  app.listen(port, async () => {
+    await startDatabase();
+
+    console.log(`🚀 server running on PORT: ${port}`);
+  });
 module.exports = app;

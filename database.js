@@ -1,12 +1,26 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+require('dotenv').config()  
 
-const connect = async() => {
-    try{
-        await mongoose.connect(process.env.DATABASE)
-    }
-    catch(err){
-        console.error(err)
-    }
+const startDatabase = async () => {
+  try {
+    await mongoose.connect('mongodb+srv://kiruthik:kiruthikktm@cluster0.sfoxrec.mongodb.net/Cluster()?retryWrites=true&w=majority');
+    console.log('connected to MongoDB');
+  } catch (err) {
+    console.error('error connecting to MongoDB:', err.message);
+  }
+};
+
+const stopDatabase = async () => {
+  try {
+    await mongoose.disconnect();
+    console.log(' disconnected from MongoDB');
+  } catch (err) {
+    console.error('error disconnecting from MongoDB:', err.message);
+  }
+};
+
+const isConnected = () => {
+  return mongoose.connection.readyState === 1;
 }
-const isconnected =() => mongoose.connection.readyState === 1 ? true:false
-module.exports = {connect, isconnected}
+
+module.exports = { startDatabase, stopDatabase, isConnected };
