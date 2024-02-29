@@ -28,6 +28,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Firstinput() {
     let [data, setData] = useState(null);
@@ -52,7 +53,7 @@ export default function Firstinput() {
   
     return (
       <div className="container">
-        <div>Hello world</div>
+        <Link to='/postdata'><button>ADD</button></Link>
       
         <div>
           {data &&
@@ -66,6 +67,7 @@ export default function Firstinput() {
                 <h1>Mileage={item.Mileage}</h1>
                 <h1>Location={item.Location}</h1>
                 <h1>Seller={item.Seller}</h1>
+                <hr></hr>
               </div>
             ))}
         </div>
