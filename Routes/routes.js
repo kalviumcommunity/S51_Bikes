@@ -102,7 +102,16 @@ getRouter.get("/logout", (req, res)=>{
     res.clearCookie('username')
     res.send('Logout successful')
 })
+const jwt = require('jsonwebtoken');
 
+app.post('/auth', (req, res) => {
+    const { username, password } = req.body;
+    // Generate JWT token
+    const token = jwt.sign({ username: username },process.env.ACCESS_TOKEN);
+    res.send({ token });
+    res.cookie('token', token);
+
+});
 
 
 
