@@ -4,6 +4,7 @@ const postRouter = express.Router();
 const patchRouter = express.Router();
 const deleteRouter = express.Router();
 const Secbikes = require("./../models/secbikes.model")
+const updateAndPostJoi = require('../validator')
 
 
 getRouter.get('/get', async (req, res) => {
@@ -25,10 +26,16 @@ getRouter.get('/get', async (req, res) => {
 
 postRouter.post('/post', async (req, res) => {
     try {
-        const { Brand,Model,Year,Price,Condition,Mileage,Location,Seller  } = req.body;
+        const {error, value} = updateAndPostJoi(req.body)
+        if(error){
+            return res.status(400).json(error.details)
+        }
+        else{
+            const { Brand,Model,Year,Price,Condition,Mileage,Location,Seller  } = req.body;
         const newSecbikes = await Secbikes.create({ Brand,Model,Year,Price,Condition,Mileage,Location,Seller  }); 
         console.log("new", newSecbikes);
         res.status(200).json(newSecbikes);
+        }
     } catch(err) {
         console.error(err);
         return res.status(500).send({
@@ -40,7 +47,12 @@ postRouter.post('/post', async (req, res) => {
 
 patchRouter.patch('/patch/:Model', async (req, res)=>{
     try {
-        const { Model } = req.params; 
+        const{error, value} = updateAndPostJoi(req.body)
+        if(error){
+            return res.status(400).json(error.details)
+        }
+        else{
+            const { Model } = req.params; 
         const deletedFields = req.body; 
 
         
@@ -52,6 +64,7 @@ patchRouter.patch('/patch/:Model', async (req, res)=>{
 
         
         res.status(200).json(deletedBikes);
+        }
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Something went wrong' });
