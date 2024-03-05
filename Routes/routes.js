@@ -92,6 +92,17 @@ deleteRouter.delete('/delete/:Model', async (req, res)=>{
     }
 })
 
+postRouter.post("/login", (req, res) => {
+    const {username} = req.body
+    res.cookie("username", username)
+    res.json(username)
+})
+
+getRouter.get("/logout", (req, res)=>{
+    res.clearCookie('username')
+    res.send('Logout successful')
+})
+
 
 
 
