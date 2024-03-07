@@ -1,75 +1,85 @@
-// import React from 'react'
-// const data = { "Brand": "Yamaha", 
-//                "Model": "YZF-R6", 
-//                "Year": 2018, 
-//                "Price": 55000 ,
-//                "Condition": "Used",
-//                "Mileage": 12000 , 
-//                "Location": "Chennai", 
-//                "Seller": "Rakshan" }
-
-// function Firstinput() {
-//     return (
-//         <div>
-//             <h1>Brand={data.Brand}</h1>
-//             <h1>Model={data.Model}</h1>
-//             <h1>Year={data.Year}</h1>
-//             <h1>Price={data.Price}</h1>
-//             <h1>Condition={data.Condition}</h1>
-//             <h1>Milleage={data.Mileage}</h1>
-//             <h1>Location={data.Location}</h1>
-//             <h1>Seller={data.Seller}</h1>
-
-//         </div>
-//     )
-// }
-
-// export default Firstinput
-
-
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Firstinput() {
-    let [data, setData] = useState(null);
+    const [data, setData] = useState(null);
+    const [creators, setCreators] = useState([]);
+    const [selectedCreator, setSelectedCreator] = useState('');
 
     useEffect(() => {
-      fetchData();
+        fetchData();
     }, []);
-  
+
+    useEffect(() => {
+        extractCreators();
+    }, [data]);
+
     const fetchData = async () => {
-      const apiLink = "https://s51-bikes.onrender.com/get";
-      try {
-        const database = await fetch(apiLink);
-        const databaseData = await database.json();
-        setData(databaseData);
-        console.log(databaseData);
-      } catch (error) {
-        console.error(error);``
-      }
+        const apiLink = "https://s51-bikes.onrender.com/get";
+        try {
+            const response = await fetch(apiLink);
+            const databaseData = await response.json();
+            setData(databaseData);
+        } catch (error) {
+            console.error(error);
+        }
     };
-  
-    const [count, setCount] = useState(0);
-  
+
+    const extractCreators = () => {
+        if (data) {
+            const uniqueCreators = [...new Set(data.map(item => item.createdby))];
+            setCreators(uniqueCreators);
+        }
+    };
+
+    const handleDelete = async (model) => {
+        const deleteUrl = `https://s51-bikes.onrender.com/delete/${model}`;
+        try {
+            await fetch(deleteUrl, { method: 'DELETE' });
+            // Update the data state after deletion
+            setData(data.filter(item => item.Model !== model));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleCreatorChange = (event) => {
+        setSelectedCreator(event.target.value);
+    };
+
+    const filteredData = selectedCreator ? data.filter(item => item.createdby === selectedCreator) : data;
+
     return (
-      <div className="container">
-        <div>Hello world</div>
-      
-        <div>
-          {data &&
-            data.map((item, index) => (
-              <div key={index} className="item">
-                <h1>Brand={item.Brand}</h1>
-                <h1>Model={item.Model}</h1>
-                <h1>Year={item.Year}</h1>
-                <h1>Price={item.Price}</h1>
-                <h1>Condition={item.Condition}</h1>
-                <h1>Mileage={item.Mileage}</h1>
-                <h1>Location={item.Location}</h1>
-                <h1>Seller={item.Seller}</h1>
-              </div>
-            ))}
+        <div className="container">
+            <Link to='/postdata'><button>ADD</button></Link>
+            <div>
+                <div>
+                    <label htmlFor="creator">Filter by Creator:</label>
+                    <select id="creator" value={selectedCreator} onChange={handleCreatorChange}>
+                        <option value="">All</option>
+                        {creators.map(creator => (
+                            <option key={creator} value={creator}>{creator}</option>
+                        ))}
+                    </select>
+                </div>
+                {filteredData &&
+                    filteredData.map((item, index) => (
+                        <div key={index} className="item">
+                            <h1>Brand={item.Brand}</h1>
+                            <h1>Model={item.Model}</h1>
+                            <h1>Year={item.Year}</h1>
+                            <h1>Price={item.Price}</h1>
+                            <h1>Condition={item.Condition}</h1>
+                            <h1>Mileage={item.Mileage}</h1>
+                            <h1>Location={item.Location}</h1>
+                            <h1>Seller={item.Seller}</h1>
+                            <h1>Creator={item.createdby}</h1>
+                            <button onClick={(e) => handleDelete(item.Model)}>DELETE</button>
+                            <Link to={`/updatedata/${item.Model}`}><button>UPDATE</button></Link>
+                            <hr />
+                        </div>
+                    ))}
+            </div>
         </div>
-      </div>
     );
 }
-
