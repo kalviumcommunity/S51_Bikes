@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import './Firstinput.css'
 
 export default function Firstinput() {
     const [data, setData] = useState(null);
     const [creators, setCreators] = useState([]);
     const [selectedCreator, setSelectedCreator] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         fetchData();
+        checkLoginStatus();
     }, []);
 
     useEffect(() => {
         extractCreators();
     }, [data]);
+
+    useEffect(() => {
+        checkLoginStatus();
+    }, []);
 
     const fetchData = async () => {
         const apiLink = "https://s51-bikes.onrender.com/get";
@@ -23,6 +30,23 @@ export default function Firstinput() {
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const checkLoginStatus = () => {
+        const token = getCookie('token');
+        setIsLoggedIn(!!token);
+    };
+
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    };
+
+    const handleLogout = () => {
+        document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        setIsLoggedIn(false);
+        window.location.reload();
     };
 
     const extractCreators = () => {
@@ -51,7 +75,12 @@ export default function Firstinput() {
 
     return (
         <div className="container">
-            <Link to='/postdata'><button>ADD</button></Link>
+            {isLoggedIn && <Link to='/postdata'><button>ADD</button></Link>}
+            {isLoggedIn ? (
+                <button className="logout" onClick={handleLogout}>LOGOUT</button>
+            ) : (
+                <Link to='/login'><button className="login">LOGIN</button></Link>
+            )}
             <div>
                 <div>
                     <label htmlFor="creator">Filter by Creator:</label>
@@ -74,8 +103,8 @@ export default function Firstinput() {
                             <h1>Location={item.Location}</h1>
                             <h1>Seller={item.Seller}</h1>
                             <h1>Creator={item.createdby}</h1>
-                            <button onClick={(e) => handleDelete(item.Model)}>DELETE</button>
-                            <Link to={`/updatedata/${item.Model}`}><button>UPDATE</button></Link>
+                            {isLoggedIn && <button onClick={(e) => handleDelete(item.Model)}>DELETE</button>}
+                            {isLoggedIn && <Link to={`/updatedata/${item.Model}`}><button>UPDATE</button></Link>}
                             <hr />
                         </div>
                     ))}
